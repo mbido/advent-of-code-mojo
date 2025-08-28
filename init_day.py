@@ -44,9 +44,22 @@ def get_input(year, day):
 
 
 def create_src_file(path, year, day):
-    template = f"""
+    template = f"""import aoc_utils as ut
+
 def main():
-    print("Hello AOC!")
+
+    data_file = open("../data/day_{day}.txt", "r")
+    data = data_file.read()
+    data_file.close()
+
+    # Start of the problem resolution
+    start = ut.perf_counter_ns()
+    print("Executing day {day}...")
+    
+    
+
+    # End of problem resolution 
+    print("Executed in: " + String(ut.perf_counter() - start) + "s")
 """
     if os.path.exists(path):
         raise Exception(
@@ -62,6 +75,26 @@ def create_input_file(path, year, day):
         data_f.write(get_input(year, day))
 
 
+def ensure_utils_symlink(src_dir, project_root):
+    target_abs = os.path.join(project_root, "aoc_utils.mojo")
+    link_path = os.path.join(src_dir, "aoc_utils.mojo")
+
+    if not os.path.exists(target_abs):
+        return
+
+    if os.path.lexists(link_path):
+        return
+
+    relative_target = os.path.relpath(target_abs, start=src_dir)
+    try:
+        os.symlink(relative_target, link_path)
+    except OSError as e:
+        print(
+            f"Unable to create the symlink({e}). "
+            f"Create it manually with : ln -s {relative_target} {link_path}"
+        )
+
+
 def create_file_from_template(extension, year, day, no_dl=False):
 
     root_dir = os.path.join(os.getcwd(), f"{PWD}/aoc_{year}")
@@ -74,6 +107,7 @@ def create_file_from_template(extension, year, day, no_dl=False):
     if not os.path.exists(root_dir):
         os.makedirs(src_dir)
         os.makedirs(data_dir)
+        ensure_utils_symlink(src_dir, os.getcwd())
 
     create_src_file(src_file, year, day)
     if not no_dl:
