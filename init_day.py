@@ -43,27 +43,39 @@ def get_input(year, day):
     return response.text[:-1:] if response.text[-1] == "\n" else response.text
 
 
-def create_src_file(path, year, day):
+def create_src_file(path, year, day, input_file):
+
     template = f"""import aoc_utils as ut
+
+fn part1(data: String):
+    print(data)
+
+
+fn part2(data: String):
+    print(data)
 
 def main():
 
-    data_file = open("../data/day_{day}.txt", "r")
+    data_file = open("{input_file}", "r")
     data = data_file.read()
     data_file.close()
 
     # Start of the problem resolution
-    start = ut.perf_counter_ns()
-    print("Executing day {day}...")
-    
-    
+    print("Executing day {day:02}...")
+    start = ut.perf_counter()
+
+    print("--- part 1 ---")
+    part1(data)
+
+    print("--- part 2 ---")
+    # part2(data)
 
     # End of problem resolution 
     print("Executed in: " + String(ut.perf_counter() - start) + "s")
 """
     if os.path.exists(path):
         raise Exception(
-            f"The source file for AOC {year} day {day} already exists. Please remove it before trying again."
+            f"The source file for AOC {year} day {day:02} already exists. Please remove it before trying again."
         )
 
     with open(path, "w") as src_f:
@@ -101,15 +113,15 @@ def create_file_from_template(extension, year, day, no_dl=False):
     src_dir = root_dir + "/src"
     data_dir = root_dir + "/data"
 
-    src_file = src_dir + f"/day_{day}{extension}"
-    input_file = data_dir + f"/day_{day}.txt"
+    src_file = src_dir + f"/day_{day:02}{extension}"
+    input_file = data_dir + f"/day_{day:02}.txt"
 
     if not os.path.exists(root_dir):
         os.makedirs(src_dir)
         os.makedirs(data_dir)
         ensure_utils_symlink(src_dir, os.getcwd())
 
-    create_src_file(src_file, year, day)
+    create_src_file(src_file, year, day, input_file)
     if not no_dl:
         create_input_file(input_file, year, day)
 
